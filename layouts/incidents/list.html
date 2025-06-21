@@ -1,0 +1,62 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+
+{{ .Content }}
+
+{{ $incidents := where .Site.RegularPages "Section" "incidents" }}
+{{ if $incidents }}
+
+{{ $currentYear := "" }}
+{{ range $incidents.ByDate.Reverse }}
+{{ $year := .Date.Format "2006" }}
+{{ if ne $year $currentYear }}
+{{ $currentYear = $year }}
+<h2>{{ $year }}</h2>
+{{ end }}
+
+<div class="incident-card">
+    <div class="incident-meta">
+        <span class="status-badge status-{{ .Params.status }}">{{ .Params.status | title }}</span>
+        {{ if .Params.severity }}
+        <span class="severity-badge severity-{{ .Params.severity }}">{{ .Params.severity | title }}</span>
+        {{ end }}
+        <span>{{ .Date.Format "Jan 2, 2006 15:04 UTC" }}</span>
+        {{ if .Params.incident_id }}
+        <span>{{ .Params.incident_id }}</span>
+        {{ end }}
+    </div>
+    
+    <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+    
+    {{ if .Params.summary }}
+    <p>{{ .Params.summary }}</p>
+    {{ else }}
+    <p>{{ .Summary | truncate 200 }}</p>
+    {{ end }}
+    
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem;">
+        {{ if .Params.duration }}
+        <div><strong>Duration:</strong> {{ .Params.duration }}</div>
+        {{ end }}
+        
+        {{ if .Params.affected_services }}
+        <div><strong>Affected:</strong> {{ delimit .Params.affected_services ", " }}</div>
+        {{ end }}
+    </div>
+    
+    {{ if .Params.impact }}
+    <div style="margin-top: 0.5rem;">
+        <strong>Impact:</strong> {{ delimit .Params.impact ", " }}
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ else }}
+<div class="incident-card">
+    <h3>No Incidents Reported</h3>
+    <p>All systems are currently operating normally. This page will be updated if any incidents occur.</p>
+</div>
+{{ end }}
+
+{{ end }}

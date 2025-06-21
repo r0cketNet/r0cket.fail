@@ -1,0 +1,46 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+
+{{ .Content }}
+
+{{ $recentIncidents := where .Site.RegularPages "Section" "incidents" | first 5 }}
+{{ if $recentIncidents }}
+<h2>Recent Incidents</h2>
+{{ range $recentIncidents }}
+<div class="incident-card">
+    <div class="incident-meta">
+        <span class="status-badge status-{{ .Params.status }}">{{ .Params.status | title }}</span>
+        {{ if .Params.severity }}
+        <span class="severity-badge severity-{{ .Params.severity }}">{{ .Params.severity | title }}</span>
+        {{ end }}
+        <span>{{ .Date.Format "Jan 2, 2006 15:04 UTC" }}</span>
+        {{ if .Params.incident_id }}
+        <span>{{ .Params.incident_id }}</span>
+        {{ end }}
+    </div>
+    
+    <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+    
+    {{ if .Params.summary }}
+    <p>{{ .Params.summary }}</p>
+    {{ else }}
+    <p>{{ .Summary | truncate 150 }}</p>
+    {{ end }}
+    
+    {{ if .Params.duration }}
+    <p><strong>Duration:</strong> {{ .Params.duration }}</p>
+    {{ end }}
+    
+    {{ if .Params.affected_services }}
+    <p><strong>Affected:</strong> {{ delimit .Params.affected_services ", " }}</p>
+    {{ end }}
+</div>
+{{ end }}
+
+<p><a href="/incidents/">View all incidents →</a></p>
+{{ else }}
+<h2>Recent Incidents</h2>
+<p>No incidents to report. All systems are operating normally.</p>
+{{ end }}
+
+{{ end }}

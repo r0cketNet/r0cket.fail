@@ -1,10 +1,16 @@
-# Sample workflow for building and deploying a Hugo site to GitHub Pages
-name: Deploy Hugo site to Pages
+# Deploy AS214503 Incident Reports to GitHub Pages
+name: Deploy AS214503 Incident Reports
 
 on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+    paths:
+      - 'content/**'
+      - 'layouts/**'
+      - 'static/**'
+      - 'hugo.toml'
+      - 'archetypes/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,31 +37,47 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.128.0
+      HUGO_VERSION: 0.134.2
     steps:
-      - name: Install Hugo CLI
-        run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
-      - name: Install Dart Sass
-        run: sudo snap install dart-sass
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           submodules: recursive
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.134.2'
+          extended: true
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+
+      - name: Setup Node.js (if needed)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+        if: hashFiles('package-lock.json') != ''
+
       - name: Install Node.js dependencies
-        run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
-      - name: Build with Hugo
+        run: npm ci
+        if: hashFiles('package-lock.json') != ''
+
+      - name: Build Hugo site
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
           HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
         run: |
           hugo \
+            --gc \
             --minify \
+            --enableGitInfo \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

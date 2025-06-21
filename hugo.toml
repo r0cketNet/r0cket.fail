@@ -1,0 +1,36 @@
+baseURL = 'https://r0cket.fail/'
+languageCode = 'en-us'
+title = 'AS214503 Incident Reports'
+
+# Site metadata
+[params]
+  description = "Network incident reports and status updates for AS214503"
+  keywords = ["AS214503", "network", "incidents", "status", "BGP", "outage"]
+  author = "AS214503 Operations Team"
+  
+# Menu configuration
+[[menu.main]]
+  name = "Incidents"
+  url = "/incidents/"
+  weight = 10
+
+# Content settings
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "github"
+    lineNos = true
+
+# RSS settings
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+
+# Pagination
+paginate = 20
+
+# Permalinks
+[permalinks]
+  incidents = "/incidents/:year/:slug/"
