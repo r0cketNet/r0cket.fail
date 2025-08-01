@@ -1,6 +1,7 @@
 baseURL = 'https://r0cket.fail/'
 languageCode = 'en-us'
 title = 'AS214503 Incident Reports'
+buildFuture = true
 
 # Site metadata
 [params]
